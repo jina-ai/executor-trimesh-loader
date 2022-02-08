@@ -1,0 +1,5 @@
+manifest_version: 1
+name: TrimeshLoader
+description: Loads triangular meshes and extract point cloud
+url: https://github.com/jina-ai/executor-trimesh-loader
+keywords: [loader, mesh, 3d, trimesh]

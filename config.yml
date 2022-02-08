@@ -1,0 +1,4 @@
+jtype: TrimeshLoader
+metas:
+  py_modules:
+    - executor.py
