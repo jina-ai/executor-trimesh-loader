@@ -1,7 +1,11 @@
+from pathlib import Path
+
 import pytest
 from jina import Document, DocumentArray, Flow
 
 from executor import TrimeshLoader
+
+data_dir = Path(__file__).parent.parent
 
 
 @pytest.fixture
@@ -10,6 +14,9 @@ def docs():
     doc = Document(
         uri='https://storage.googleapis.com/showcase-3d-models/ShapeNetV2/airplane_aeroplane_plane_0.glb'
     )
+    docs.append(doc)
+    docs.append(Document(uri=open(data_dir / 'test.base64').read()))
+
     return docs
 
 

@@ -5,7 +5,7 @@ from jina import Document, DocumentArray
 
 from executor import TrimeshLoader
 
-data_dir = Path(__file__).parent
+data_dir = Path(__file__).parent.parent
 
 
 @pytest.fixture
