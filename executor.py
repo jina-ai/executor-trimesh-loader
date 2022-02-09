@@ -36,10 +36,8 @@ class TrimeshLoader(Executor):
         samples = parameters.get('samples', self.samples)
 
         for doc in docs:
-            if not doc.uri and doc.content is None:
-                self.logger.error(
-                    f'No uri or content passed for the Document: {doc.id}'
-                )
+            if not doc.uri and doc.blob is None:
+                self.logger.error(f'No uri or blob passed for the Document: {doc.id}')
                 continue
 
             tmp_file = None
@@ -54,16 +52,19 @@ class TrimeshLoader(Executor):
                         # NOTE: reset the uri for base64
                         doc.uri = tmp_file.name
                     uri = tmp_file.name
-            elif doc.buffer:
+            else:
                 tmp_file = tempfile.NamedTemporaryFile(suffix='.glb', delete=False)
                 doc.dump_buffer_to_file(tmp_file.name)
                 uri = tmp_file.name
-            else:
-                continue
 
-            self._load(doc, uri, samples, as_chunks)
+            try:
+                self._load(doc, uri, samples, as_chunks)
+            except Exception:
+                print(f'load trimesh failed,drop this document:{doc.uri}')
+                doc.blob = None
             if tmp_file:
                 os.unlink(tmp_file.name)
+        return DocumentArray(d for d in docs if d.blob is not None)
 
     def _load(self, doc, uri, samples: int, as_chunks: bool = False):
 
