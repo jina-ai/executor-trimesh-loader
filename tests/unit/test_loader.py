@@ -20,9 +20,7 @@ def document_uri():
 
 @pytest.fixture
 def document_base64():
-    doc = Document(uri=str(data_dir / 'test.glb'), mime_type='application/octet-stream')
-    doc.load_uri_to_buffer()
-    doc.dump_buffer_to_datauri(base64=True)
+    doc = Document(uri=open(data_dir / 'test.base64').read())
     return doc
 
 

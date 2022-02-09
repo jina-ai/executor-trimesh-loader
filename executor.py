@@ -36,8 +36,10 @@ class TrimeshLoader(Executor):
         samples = parameters.get('samples', self.samples)
 
         for doc in docs:
-            if not doc.uri and doc.blob is None:
-                self.logger.error(f'No uri or blob passed for the Document: {doc.id}')
+            if not doc.uri and doc.content is None:
+                self.logger.error(
+                    f'No uri or content passed for the Document: {doc.id}'
+                )
                 continue
 
             tmp_file = None
