@@ -63,9 +63,11 @@ class TrimeshLoader(Executor):
 
             try:
                 self._load(doc, uri, samples, as_chunks)
-            except Exception:
-                print(f'load trimesh failed,drop this document:{doc.uri}')
-                doc.blob = None
+            except Exception as ex:
+                self.logger.error(f'load trimesh of doc ({doc.uri}) failed, the exception: {ex}')
+                if as_chunks:
+                    doc.chunks.clear()
+                    
             if tmp_file:
                 os.unlink(tmp_file.name)
         return DocumentArray(d for d in docs if d.blob is not None)
