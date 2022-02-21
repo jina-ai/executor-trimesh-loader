@@ -27,23 +27,23 @@ def document_base64():
 @pytest.fixture
 def document_blob():
     doc = Document(uri=str(data_dir / 'test.glb'), mime_type='application/octet-stream')
-    doc.load_uri_to_buffer()
+    doc.load_uri_to_blob()
     return doc
 
 
 def test_doc_uri(trimesh_loader, document_uri):
     trimesh_loader.process(DocumentArray([document_uri]))
-    assert document_uri.blob is not None
-    assert document_uri.blob.shape == (1024, 3)
+    assert document_uri.tensor is not None
+    assert document_uri.tensor.shape == (1024, 3)
 
 
 def test_doc_base64(trimesh_loader, document_base64):
     trimesh_loader.process(DocumentArray([document_base64]))
-    assert document_base64.blob is not None
-    assert document_base64.blob.shape == (1024, 3)
+    assert document_base64.tensor is not None
+    assert document_base64.tensor.shape == (1024, 3)
 
 
 def test_doc_blob(trimesh_loader, document_blob):
     trimesh_loader.process(DocumentArray([document_blob]))
-    assert document_blob.blob is not None
-    assert document_blob.blob.shape == (1024, 3)
+    assert document_blob.tensor is not None
+    assert document_blob.tensor.shape == (1024, 3)
