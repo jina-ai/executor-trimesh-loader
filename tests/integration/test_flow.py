@@ -23,6 +23,6 @@ def docs():
 def test_use_in_flow(docs):
     with Flow().add(uses=TrimeshLoader, name='trimesh_loader') as flow:
         data = flow.post(on='/index', inputs=docs, return_results=True)
-        for doc in data[0].docs:
-            assert doc.blob is not None
-            assert doc.blob.shape == (1024, 3)
+        for doc in data:
+            assert doc.tensor is not None
+            assert doc.tensor.shape == (1024, 3)

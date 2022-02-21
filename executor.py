@@ -48,15 +48,16 @@ class TrimeshLoader(Executor):
                 uri = doc.uri
                 if schema in ['data', 'http', 'https']:
                     tmp_file = tempfile.NamedTemporaryFile(suffix='.glb', delete=False)
-                    doc.dump_uri_to_file(tmp_file.name)
+                    doc.load_uri_to_blob()
+                    doc.save_blob_to_file(tmp_file.name)
 
                     if schema == 'data':
                         # NOTE: reset the uri for base64
                         doc.uri = tmp_file.name
                     uri = tmp_file.name
-            elif doc.buffer:
+            elif doc.blob:
                 tmp_file = tempfile.NamedTemporaryFile(suffix='.glb', delete=False)
-                doc.dump_buffer_to_file(tmp_file.name)
+                doc.save_blob_to_file(tmp_file.name)
                 uri = tmp_file.name
             else:
                 continue
@@ -64,13 +65,19 @@ class TrimeshLoader(Executor):
             try:
                 self._load(doc, uri, samples, as_chunks)
             except Exception as ex:
-                self.logger.error(f'load trimesh of doc ({doc.uri}) failed, the exception: {ex}')
+                self.logger.error(
+                    f'load trimesh of doc ({doc.uri}) failed, the exception: {ex}'
+                )
                 if as_chunks:
                     doc.chunks.clear()
-                    
+
             if tmp_file:
                 os.unlink(tmp_file.name)
-        return DocumentArray(d for d in docs if (len(d.chunks) > 0 if as_chunks else (d.blob is not None)))
+        return DocumentArray(
+            d
+            for d in docs
+            if (len(d.chunks) > 0 if as_chunks else (d.blob is not None))
+        )
 
     def _load(self, doc, uri, samples: int, as_chunks: bool = False):
 
@@ -79,8 +86,8 @@ class TrimeshLoader(Executor):
             scene = trimesh.load(uri, force='scene')
             for geo in scene.geometry.values():
                 geo: trimesh.Trimesh
-                doc.chunks.append(Document(blob=geo.sample(samples)))
+                doc.chunks.append(Document(tensor=geo.sample(samples)))
         else:
             # combine a scene into a single mesh
             mesh = trimesh.load(uri, force='mesh')
-            doc.blob = mesh.sample(samples)
+            doc.tensor = mesh.sample(samples)
