@@ -47,7 +47,15 @@ class TrimeshLoader(Executor):
                 schema = urllib.parse.urlparse(doc.uri).scheme
                 uri = doc.uri
                 if schema in ['data', 'http', 'https']:
-                    tmp_file = tempfile.NamedTemporaryFile(suffix='.glb', delete=False)
+                    if schema in ['http', 'https']:
+                        file_format = os.path.splitext(uri)[1].lstrip('.')
+                    else:
+                        # the default format is `glb`
+                        file_format = doc.tags.get('file_format', 'glb')
+
+                    tmp_file = tempfile.NamedTemporaryFile(
+                        suffix=f'.{file_format}', delete=False
+                    )
                     doc.load_uri_to_blob()
                     doc.save_blob_to_file(tmp_file.name)
 
@@ -56,7 +64,11 @@ class TrimeshLoader(Executor):
                         doc.uri = tmp_file.name
                     uri = tmp_file.name
             elif doc.blob:
-                tmp_file = tempfile.NamedTemporaryFile(suffix='.glb', delete=False)
+                # the default format is `glb`
+                file_format = doc.tags.get('file_format', 'glb')
+                tmp_file = tempfile.NamedTemporaryFile(
+                    suffix=f'.{file_format}', delete=False
+                )
                 doc.save_blob_to_file(tmp_file.name)
                 uri = tmp_file.name
             else:

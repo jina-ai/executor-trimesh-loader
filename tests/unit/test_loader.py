@@ -21,6 +21,7 @@ def document_uri():
 @pytest.fixture
 def document_base64():
     doc = Document(uri=open(data_dir / 'test.base64').read())
+    doc.tags['file_format'] = 'glb'
     return doc
 
 
@@ -28,6 +29,7 @@ def document_base64():
 def document_blob():
     doc = Document(uri=str(data_dir / 'test.glb'), mime_type='application/octet-stream')
     doc.load_uri_to_blob()
+    doc.tags['file_format'] = 'glb'
     return doc
 
 
