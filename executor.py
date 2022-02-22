@@ -50,6 +50,7 @@ class TrimeshLoader(Executor):
                     if schema in ['http', 'https']:
                         file_format = os.path.splitext(uri)[1].lstrip('.')
                     else:
+                        # the default format is `glb`
                         file_format = doc.tags.get('file_format', 'glb')
 
                     tmp_file = tempfile.NamedTemporaryFile(
@@ -63,6 +64,7 @@ class TrimeshLoader(Executor):
                         doc.uri = tmp_file.name
                     uri = tmp_file.name
             elif doc.blob:
+                # the default format is `glb`
                 file_format = doc.tags.get('file_format', 'glb')
                 tmp_file = tempfile.NamedTemporaryFile(
                     suffix=f'.{file_format}', delete=False
