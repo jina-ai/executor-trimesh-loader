@@ -88,7 +88,7 @@ class TrimeshLoader(Executor):
         return DocumentArray(
             d
             for d in docs
-            if (len(d.chunks) > 0 if as_chunks else (d.blob is not None))
+            if (len(d.chunks) > 0 if as_chunks else (d.tensor is not None))
         )
 
     def _load(self, doc, uri, samples: int, as_chunks: bool = False):
