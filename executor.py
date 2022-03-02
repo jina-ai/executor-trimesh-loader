@@ -1,6 +1,7 @@
 import os
 import tempfile
 import urllib
+import zipfile
 from typing import Dict, Optional
 
 import trimesh
@@ -62,13 +63,40 @@ class TrimeshLoader(Executor):
                     elif schema == 'data':
                         # the default format is `glb`
                         file_format = doc.tags.get('file_format', 'glb')
-
                         tmp_file = tempfile.NamedTemporaryFile(
                             suffix=f'.{file_format}', delete=False
                         )
                         doc.load_uri_to_blob()
                         doc.save_blob_to_file(tmp_file.name)
-
+                        if 'zip' == file_format:
+                            zf = zipfile.ZipFile(tmp_file.name)
+                            try:
+                                zipFileName = tmp_file.name
+                                path = tmp_file.name.split('.')[0]
+                                zf.extractall(path=path)
+                                file_list = os.listdir(path)
+                                # 准备循环判断每个元素是否是文件夹还是文件，是文件的话，把名称传入list，是文件夹的话，递归
+                                file_flag = True
+                                for file in file_list:
+                                    cur_path = os.path.join(path, file)
+                                    if not os.path.isdir(cur_path) and file.endswith('gltf'):
+                                        # prefer to gltf first
+                                        if file.endswith('gltf'):
+                                            tmp_file.name = cur_path
+                                            file_flag = False
+                                            break
+                                        if file.endswith('glb'):
+                                            tmp_file.name = cur_path
+                                            file_flag = False
+                                            break
+                                if file_flag:
+                                    self.logger.error(
+                                        f'No uri or content passed for the Document: {doc.id}'
+                                    )
+                                    continue
+                            except RuntimeError as e:
+                                print(e)
+                            zf.close()
                         self._load(
                             doc,
                             tmp_file.name,
@@ -100,7 +128,11 @@ class TrimeshLoader(Executor):
                 continue
 
             if tmp_file:
-                os.unlink(tmp_file.name)
+                if zipFileName:
+                    os.unlink(zipFileName)
+                    os.unlink(zipFileName+'.zip')
+                else:
+                    os.unlink(tmp_file.name)
 
         return DocumentArray(
             d
