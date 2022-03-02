@@ -53,6 +53,7 @@ class TrimeshLoader(Executor):
                 continue
 
             tmp_file = None
+            zip_file_name = None
             if doc.uri:
                 schema = urllib.parse.urlparse(doc.uri).scheme
                 if schema in ['data', 'http', 'https']:
@@ -71,7 +72,7 @@ class TrimeshLoader(Executor):
                         if 'zip' == file_format:
                             zf = zipfile.ZipFile(tmp_file.name)
                             try:
-                                zipFileName = tmp_file.name
+                                zip_file_name = tmp_file.name
                                 path = tmp_file.name.split('.')[0]
                                 zf.extractall(path=path)
                                 file_list = os.listdir(path)
@@ -128,9 +129,9 @@ class TrimeshLoader(Executor):
                 continue
 
             if tmp_file:
-                if zipFileName:
-                    os.unlink(zipFileName)
-                    os.unlink(zipFileName+'.zip')
+                if zip_file_name:
+                    os.unlink(zip_file_name)
+                    os.unlink(zip_file_name+'.zip')
                 else:
                     os.unlink(tmp_file.name)
 
