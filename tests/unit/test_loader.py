@@ -33,6 +33,11 @@ def document_base64():
 
 
 @pytest.fixture
+def document_zip():
+    return Document(uri=str(data_dir / 'test.zip'))
+
+
+@pytest.fixture
 def document_blob():
     doc = Document(uri=str(data_dir / 'test.glb'), mime_type='application/octet-stream')
     doc.load_uri_to_blob()
@@ -45,6 +50,12 @@ def test_doc_uri(trimesh_loader, document_uri):
     trimesh_loader.process(DocumentArray([document_uri]))
     assert document_uri.tensor is not None
     assert document_uri.tensor.shape == (1024, 3)
+
+
+def test_doc_zip(trimesh_loader, document_zip):
+    trimesh_loader.process(DocumentArray([document_zip]))
+    assert document_zip.tensor is not None
+    assert document_zip.tensor.shape == (1024, 3)
 
 
 def test_doc_http(trimesh_loader, document_http):
