@@ -51,62 +51,112 @@ class TrimeshLoader(Executor):
                 )
                 continue
 
-            tmp_file = None
-            if doc.uri:
-                schema = urllib.parse.urlparse(doc.uri).scheme
-                if schema in ['data', 'http', 'https']:
-                    if schema in ['http', 'https']:
+            try:
+                tmp_file = None
+                if doc.uri:
+                    schema = urllib.parse.urlparse(doc.uri).scheme
+                    if schema in ['data', 'http', 'https']:
+                        if schema in ['http', 'https']:
+                            self._load(
+                                doc,
+                                doc.uri,
+                                samples,
+                                is_remote=True,
+                                as_chunks=as_chunks,
+                            )
+                        elif schema == 'data':
+                            # the default format is `glb`
+                            file_format = doc.tags.get('file_format', 'glb')
+
+                            tmp_file = tempfile.NamedTemporaryFile(
+                                suffix=f'.{file_format}', delete=False
+                            )
+                            doc.load_uri_to_blob()
+                            doc.save_blob_to_file(tmp_file.name)
+
+                            if file_format == 'zip':
+                                self._load_zip(
+                                    doc, tmp_file.name, samples, as_chunks=as_chunks
+                                )
+                            else:
+                                self._load(
+                                    doc,
+                                    tmp_file.name,
+                                    samples,
+                                    is_remote=False,
+                                    as_chunks=as_chunks,
+                                )
+
+                            if self.drop_content:
+                                doc.pop('uri')
+                    elif doc.uri.endswith('.zip'):
+                        self._load_zip(doc, doc.uri, samples, as_chunks=as_chunks)
+                    else:
                         self._load(
-                            doc, doc.uri, samples, is_remote=True, as_chunks=as_chunks
-                        )
-                    elif schema == 'data':
-                        # the default format is `glb`
-                        file_format = doc.tags.get('file_format', 'glb')
-
-                        tmp_file = tempfile.NamedTemporaryFile(
-                            suffix=f'.{file_format}', delete=False
-                        )
-                        doc.load_uri_to_blob()
-                        doc.save_blob_to_file(tmp_file.name)
-
-                        self._load(
-                            doc,
-                            tmp_file.name,
-                            samples,
-                            is_remote=False,
-                            as_chunks=as_chunks,
+                            doc, doc.uri, samples, is_remote=False, as_chunks=as_chunks
                         )
 
-                        if self.drop_content:
-                            doc.pop('uri')
-                else:
-                    self._load(
-                        doc, doc.uri, samples, is_remote=False, as_chunks=as_chunks
+                elif doc.blob:
+                    # the default format is `glb`
+                    file_format = doc.tags.get('file_format', 'glb')
+                    tmp_file = tempfile.NamedTemporaryFile(
+                        suffix=f'.{file_format}', delete=False
                     )
+                    doc.save_blob_to_file(tmp_file.name)
+                    self._load(
+                        doc,
+                        tmp_file.name,
+                        samples,
+                        is_remote=False,
+                        as_chunks=as_chunks,
+                    )
+                    if self.drop_content:
+                        doc.pop('blob')
+                else:
+                    continue
 
-            elif doc.blob:
-                # the default format is `glb`
-                file_format = doc.tags.get('file_format', 'glb')
-                tmp_file = tempfile.NamedTemporaryFile(
-                    suffix=f'.{file_format}', delete=False
+                if tmp_file:
+                    tmp_file.close()
+                    os.unlink(tmp_file.name)
+            except Exception as ex:
+                self.logger.warning(
+                    f'Will ignore the doc (uri={doc.uri}) with the exception: {ex!r}.'
                 )
-                doc.save_blob_to_file(tmp_file.name)
-                self._load(
-                    doc, tmp_file.name, samples, is_remote=False, as_chunks=as_chunks
-                )
-                if self.drop_content:
-                    doc.pop('blob')
-            else:
                 continue
-
-            if tmp_file:
-                os.unlink(tmp_file.name)
 
         return DocumentArray(
             d
             for d in docs
             if (len(d.chunks) > 0 if as_chunks else (d.tensor is not None))
         )
+
+    def _load_zip(self, doc, uri, samples: int, as_chunks: bool = False):
+        import shutil
+        import zipfile
+        from itertools import chain
+        from pathlib import Path
+
+        zf = zipfile.ZipFile(uri)
+        target = Path(uri + '.extracted')
+
+        try:
+            zf.extractall(path=target)
+
+            for file in list(chain(target.glob('**/*.gltf'), target.glob('**/*.glb'))):
+                self._load(
+                    doc,
+                    str(file),
+                    samples,
+                    is_remote=False,
+                    as_chunks=as_chunks,
+                )
+                break
+
+        except Exception as ex:
+            raise ex
+        finally:
+            zf.close()
+            shutil.rmtree(target)
 
     def _load(
         self, doc, uri, samples: int, is_remote: bool = False, as_chunks: bool = False
