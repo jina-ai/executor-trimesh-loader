@@ -173,6 +173,9 @@ class TrimeshLoader(Executor):
                 geo: trimesh.Trimesh
                 doc.chunks.append(Document(tensor=geo.sample(samples)))
         else:
+            # hack to ignore loading image materials for gltf
+            trimesh.exchange.gltf._parse_materials = lambda *args, **kwargs: None
+
             # combine a scene into a single mesh
             if is_remote:
                 mesh = trimesh.load_remote(uri, force='mesh')
