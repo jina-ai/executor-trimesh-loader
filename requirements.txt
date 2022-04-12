@@ -1,1 +1,1 @@
-trimesh[easy]
+trimesh[easy]==3.10.8
