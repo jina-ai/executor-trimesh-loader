@@ -175,7 +175,7 @@ class TrimeshLoader(Executor):
 
             for geo in scene.geometry.values():
                 geo: trimesh.Trimesh
-                geo_samples = geo.sample(samples)
+                geo_samples = np.asarray(geo.sample(samples))
                 if np.isnan(geo_samples).any():
                     raise ValueError('NaN values contained in the model')
                 doc.chunks.append(Document(tensor=geo_samples))
@@ -186,7 +186,7 @@ class TrimeshLoader(Executor):
             else:
                 mesh = trimesh.load(uri, force='mesh')
 
-            mesh_samples = mesh.sample(samples)
+            mesh_samples = np.asarray(mesh.sample(samples))
             if np.isnan(mesh_samples).any():
                 raise ValueError('NaN values contained in the model')
             doc.tensor = mesh_samples
