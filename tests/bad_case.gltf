@@ -1,0 +1,256 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 7532,
+      "max": [
+        6.409543,
+        NaN,
+        7.54843569
+      ],
+      "min": [
+        -4.484462,
+        NaN,
+        -2.156024
+      ],
+      "normalized": false,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 7532,
+      "normalized": false,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 7532,
+      "normalized": false,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 7532,
+      "normalized": false,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5125,
+      "count": 8580,
+      "normalized": false,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5125,
+      "count": 8400,
+      "normalized": false,
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "generator": "UniGLTF-2.23.0",
+    "version": "2.0"
+  },
+  "buffers": [
+    {
+      "byteLength": 369200,
+      "uri": "c pine 4.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 90384,
+      "byteOffset": 0,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 90384,
+      "byteOffset": 90384,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 60256,
+      "byteOffset": 180768,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 60256,
+      "byteOffset": 241024,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 34320,
+      "byteOffset": 301280,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 33600,
+      "byteOffset": 335600,
+      "target": 34963
+    }
+  ],
+  "extensionsUsed": [
+    "KHR_materials_unlit",
+    "KHR_texture_transform"
+  ],
+  "images": [
+    {
+      "mimeType": "image\/png",
+      "name": "diffuse",
+      "uri": "textures\/diffuse.png"
+    }
+  ],
+  "materials": [
+    {
+      "alphaCutoff": 0.3,
+      "alphaMode": "MASK",
+      "doubleSided": true,
+      "name": "Optimized Bark Material (Instance)",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "baseColorTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 0,
+          "texCoord": 0
+        },
+        "metallicFactor": 1,
+        "roughnessFactor": 1
+      }
+    },
+    {
+      "alphaCutoff": 0.3,
+      "alphaMode": "MASK",
+      "doubleSided": true,
+      "name": "Optimized Leaf Material (Instance)",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "baseColorTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                0
+              ],
+              "scale": [
+                1,
+                1
+              ]
+            }
+          },
+          "index": 0,
+          "texCoord": 0
+        },
+        "metallicFactor": 1,
+        "roughnessFactor": 1
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "extras": {
+        "targetNames": [
+        ]
+      },
+      "name": "Mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TEXCOORD_0": 2,
+            "TEXCOORD_1": 3
+          },
+          "extras": {
+            "targetNames": [
+            ]
+          },
+          "indices": 4,
+          "material": 0,
+          "mode": 4
+        },
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TEXCOORD_0": 2,
+            "TEXCOORD_1": 3
+          },
+          "extras": {
+            "targetNames": [
+            ]
+          },
+          "indices": 5,
+          "material": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "c pine 4(Clone)"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9985,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    }
+  ]
+}

@@ -3,6 +3,7 @@ import tempfile
 import urllib
 from typing import Dict, Optional
 
+import numpy as np
 import trimesh
 from jina import Document, DocumentArray, Executor, requests
 from jina.logging.logger import JinaLogger
@@ -174,11 +175,18 @@ class TrimeshLoader(Executor):
 
             for geo in scene.geometry.values():
                 geo: trimesh.Trimesh
-                doc.chunks.append(Document(tensor=geo.sample(samples)))
+                geo_samples = geo.sample(samples)
+                if np.isnan(geo_samples).any():
+                    raise ValueError('NaN values contained in the model')
+                doc.chunks.append(Document(tensor=geo_samples))
         else:
             # combine a scene into a single mesh
             if is_remote:
                 mesh = trimesh.load_remote(uri, force='mesh')
             else:
                 mesh = trimesh.load(uri, force='mesh')
-            doc.tensor = mesh.sample(samples)
+
+            mesh_samples = mesh.sample(samples)
+            if np.isnan(mesh_samples).any():
+                raise ValueError('NaN values contained in the model')
+            doc.tensor = mesh_samples
