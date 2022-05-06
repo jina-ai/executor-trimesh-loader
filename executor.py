@@ -20,6 +20,7 @@ class TrimeshLoader(Executor):
         samples: int = 1024,
         as_chunks: bool = False,
         drop_content: bool = True,
+        filters: Optional[dict] = None,
         *args,
         **kwargs,
     ):
@@ -28,6 +29,8 @@ class TrimeshLoader(Executor):
         :param as_chunks: when multiple geometry stored in one mesh file,
             then store each geometry into different :attr:`.chunks`
         :param drop_content: if True, the content of document (`uri` or `blob`) will be dropped in the end.
+        :param filters: The filter condition that the documents need to fulfill before reaching the Executor.
+            The condition can be defined in the form of a `DocArray query condition <https://docarray.jina.ai/fundamentals/documentarray/find/#query-by-conditions>`
         :param args: the *args for Executor
         :param kwargs: the **kwargs for Executor
         """
@@ -39,16 +42,23 @@ class TrimeshLoader(Executor):
             getattr(self.metas, 'name', self.__class__.__name__)
         ).logger
 
+        self.filters = filters
+
     @requests
     def process(self, docs: DocumentArray, parameters: Optional[Dict] = {}, **kwargs):
         """Convert a 3d mesh-like :attr:`.uri` into :attr:`.tensor`"""
         if docs is None:
             return
 
+        if self.filters:
+            filtered_docs = docs.find(self.filters)
+        else:
+            filtered_docs = docs
+
         as_chunks = bool(parameters.get('as_chunks', self.as_chunk))
         samples = parameters.get('samples', self.samples)
 
-        for doc in docs:
+        for doc in filtered_docs:
             if not doc.uri and doc.content is None:
                 self.logger.error(
                     f'No uri or content passed for the Document: {doc.id}'
@@ -128,11 +138,14 @@ class TrimeshLoader(Executor):
                 )
                 continue
 
-        return DocumentArray(
-            d
-            for d in docs
-            if (len(d.chunks) > 0 if as_chunks else (d.tensor is not None))
-        )
+        if as_chunks:
+            return DocumentArray(
+                d for d in docs if (len(d.chunks) > 0) or (d.embedding is not None)
+            )
+        else:
+            return DocumentArray(
+                d for d in docs if (d.tensor is not None) or (d.embedding is not None)
+            )
 
     def _load_zip(self, doc, uri, samples: int, as_chunks: bool = False):
         import shutil
