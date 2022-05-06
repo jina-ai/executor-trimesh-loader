@@ -76,3 +76,20 @@ def test_doc_blob(trimesh_loader, document_blob):
     assert not document_blob.blob
     assert document_blob.tensor is not None
     assert document_blob.tensor.shape == (1024, 3)
+
+
+def test_filter(document_blob):
+    import numpy as np
+
+    loader = TrimeshLoader(filters={'embedding': {'$exists': False}})
+    document_blob.embedding = np.random.random((10,))
+    result = loader.process(DocumentArray([document_blob]))
+
+    assert len(result) == 1
+    assert result[0].embedding is not None
+    assert result[0].tensor is None
+
+    da = DocumentArray.empty(3)
+    da.append(document_blob)
+    result = loader.process(da)
+    assert len(result) == 1
